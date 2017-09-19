@@ -17,7 +17,7 @@
 #>
 
 # params
-$template = "template.docx"
+$template = "c:\temp\template.docx"
 $tempFolder = $env:TEMP + "\Populate-Word-DOCX"
 
 # unzip function
@@ -63,7 +63,7 @@ function Zip {
 Remove-Item $tempFolder -ErrorAction SilentlyContinue -Recurse -Confirm:$false | Out-Null
 mkdir $tempFolder | Out-Null
 
-# unzip
+# unzip DOCX
 Unzip $template $tempFolder
 
 # replace text
@@ -73,9 +73,9 @@ $body = $body.Replace("[placeholder1]", "hello")
 $body = $body.Replace("[placeholder2]", "world")
 $body | Out-File $bodyFile -Force -Encoding ascii
 
-# zip
+# zip DOCX
 $destfile = $template.Replace(".docx", "-after.docx")
-Remove-Item $destfile -Force
+Remove-Item $destfile -Force -ErrorAction SilentlyContinue
 Zip $tempFolder $destfile
 
 # clean folder
