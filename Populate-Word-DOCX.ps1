@@ -1,23 +1,6 @@
-<#
-.SYNOPSIS
-	Populate Microsoft Word DOCX
-.DESCRIPTION
-    Replace [placeholder] tokens with dynamic text.  DOCX file is ZIP format.  
-    Extract all contents, replace ASCII text, and bundle into fresh new ZIP(DOCX) output.
 
-	Comments and suggestions always welcome!  spjeff@spjeff.com or @spjeff
-.NOTES
-	File Namespace	: Populate-Word-DOCX.ps1
-	Author			: Jeff Jones - @spjeff
-	Version			: 0.10
-	Last Modified	: 09-19-2017
-.LINK
-	Source Code
-	http://www.github.com/spjeff/Populate-Word-DOCX
-#>
 
-# params
-$template = "c:\temp\template.docx"
+$template = "c:\Path\to\template\template.docx"
 $tempFolder = $env:TEMP + "\Populate-Word-DOCX"
 
 # unzip function
@@ -67,11 +50,22 @@ mkdir $tempFolder | Out-Null
 Unzip $template $tempFolder
 
 # replace text
+# Replace text while preserving the original encoding
+
+
 $bodyFile = $tempFolder + "\word\document.xml"
-$body = Get-Content $bodyFile
-$body = $body.Replace("[placeholder1]", "hello")
-$body = $body.Replace("[placeholder2]", "world")
-$body | Out-File $bodyFile -Force -Encoding ascii
+$body = Get-Content $bodyFile -raw -Encoding UTF8
+$body = $body.Replace("XXPlaceholderXX", "$($Userobject.Anschrift)")
+$body = $body.Replace("XXPlaceholder2XX", "$($Userobject.Dienstnehmer)")
+
+
+# Save back using StreamWriter to preserve encoding
+
+# Save back using StreamWriter to preserve encoding
+$streamWriter = [System.IO.StreamWriter]::new($bodyFile, $false, [System.Text.Encoding]::UTF8)
+$streamWriter.Write($body)
+$streamWriter.Close()
+
 
 # zip DOCX
 $destfile = $template.Replace(".docx", "-after.docx")
